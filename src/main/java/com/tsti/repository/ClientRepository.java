@@ -1,7 +1,7 @@
 package com.tsti.repository;
 
-import com.tsti.entity.Person;
+import com.tsti.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PersonRepository extends JpaRepository<Person, Long>  {
+public interface ClientRepository extends JpaRepository<Client, Long>  {
 }

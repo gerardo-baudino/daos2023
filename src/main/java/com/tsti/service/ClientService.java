@@ -1,4 +1,7 @@
 package com.tsti.service;
 
-public class PersonService {
+import org.springframework.stereotype.Service;
+
+@Service
+public class ClientService {
 }

@@ -1,4 +1,4 @@
 package com.tsti.controller;
 
-public class PersonController {
+public class ClientController {
 }
