@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.tsti</groupId>
-	<artifactId>DAOS2023</artifactId>
+	<artifactId>02-Baudino-Poleri-Pozzuto</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>DAOS2023</name>
 	<description>Demo project for Spring Boot</description>
