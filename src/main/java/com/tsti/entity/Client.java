@@ -19,6 +19,31 @@ public class Client {
     private String passportNumber;
     private String passportExpirationDate;
 
+    public Client() {
+    }
+
+    public Client(Long id, Long document, String firstName, String lastName, String address, String email, String birthDate) {
+        this.id = id;
+        this.document = document;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.email = email;
+        this.birthDate = birthDate;
+    }
+
+    public Client(Long id, Long document, String firstName, String lastName, String address, String email, String birthDate, String passportNumber, String passportExpirationDate) {
+        this.id = id;
+        this.document = document;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.email = email;
+        this.birthDate = birthDate;
+        this.passportNumber = passportNumber;
+        this.passportExpirationDate = passportExpirationDate;
+    }
+
     public Long getId() {
         return id;
     }
