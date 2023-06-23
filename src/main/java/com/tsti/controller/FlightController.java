@@ -43,9 +43,9 @@ public class FlightController {
 	}
 
 	@PutMapping("/{id}/datetime")
-	public ResponseEntity<?> updateFlightDateTime(@PathVariable Long id, @RequestBody LocalDateTime dateTime)
+	public ResponseEntity<?> updateFlightDateTime(@PathVariable Long flightNumber, @RequestBody LocalDateTime dateTime)
 			throws Exception {
-		return flightService.updateDateTime(id, dateTime);
+		return flightService.updateDateTime(flightNumber, dateTime);
 	}
 
 	@DeleteMapping("/{id}")

@@ -13,7 +13,6 @@ public class Flight {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	// TODO: no deberiamos tomar este como ID??
 	private Long flightNumber;
 	private LocalDateTime dateTime;
 	private int numRows;
@@ -22,6 +21,19 @@ public class Flight {
 	private String destination;
 	private String origin = ORIGIN;
 	private String status;
+	
+	public Flight() {
+    }
+
+    public Flight(Long id, Long flightNumber, LocalDateTime dateTime, int numRows, int seatsPerRow, String flightType, String destination) {
+        this.id = id;
+        this.flightNumber = flightNumber;
+        this.dateTime = dateTime;
+        this.numRows = numRows;
+        this.seatsPerRow = seatsPerRow;
+        this.flightType = flightType;
+        this.destination = destination;
+    }
 
 	public Long getId() {
 		return id;
