@@ -58,8 +58,8 @@ public class FlightService implements IFlightService {
 	}
 
 	@Override
-	public ResponseEntity<?> updateDateTime(Long id, LocalDateTime dateTime) throws Exception {
-		Optional<Flight> dbFlight = flightRepository.findById(id);
+	public ResponseEntity<?> updateDateTime(Long flightNumber, LocalDateTime dateTime) throws Exception {
+		Optional<Flight> dbFlight = flightRepository.findByFlightNumber(flightNumber);
 		if (dbFlight.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vuelo no encontrado");
 		}

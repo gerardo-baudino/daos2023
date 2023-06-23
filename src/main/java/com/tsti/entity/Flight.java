@@ -1,6 +1,7 @@
 package com.tsti.entity;
 
 import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,12 +9,11 @@ import jakarta.persistence.Id;
 
 @Entity
 public class Flight {
-	private static final String ORIGIN = "Aeropuerto Sauce Viejo";
+	public static final String ORIGIN = "Aeropuerto Sauce Viejo";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	// TODO: no deberiamos tomar este como ID??
 	private Long flightNumber;
 	private LocalDateTime dateTime;
 	private int numRows;
@@ -22,6 +22,21 @@ public class Flight {
 	private String destination;
 	private String origin = ORIGIN;
 	private String status;
+
+	public Flight() {
+	}
+
+	public Flight(Long id, Long flightNumber, LocalDateTime dateTime, int numRows, int seatsPerRow, String flightType, String destination, String origin, String status) {
+		this.id = id;
+		this.flightNumber = flightNumber;
+		this.dateTime = dateTime;
+		this.numRows = numRows;
+		this.seatsPerRow = seatsPerRow;
+		this.flightType = flightType;
+		this.destination = destination;
+		this.origin = origin;
+		this.status = status;
+	}
 
 	public Long getId() {
 		return id;

@@ -15,7 +15,7 @@ public interface IFlightService {
 
 	ResponseEntity<?> update(Flight flight) throws Exception;
 
-	ResponseEntity<?> updateDateTime(Long id, LocalDateTime dateTime) throws Exception;
+	ResponseEntity<?> updateDateTime(Long flightNumber, LocalDateTime dateTime) throws Exception;
 
 	ResponseEntity<?> delete(Long id) throws Exception;
 }
