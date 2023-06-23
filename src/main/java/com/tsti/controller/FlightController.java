@@ -42,7 +42,7 @@ public class FlightController {
 		return ResponseEntity.ok(flightOptional.get());
 	}
 
-	@PutMapping("/{id}/datetime")
+	@PutMapping("/{flightNumber}/datetime")
 	public ResponseEntity<?> updateFlightDateTime(@PathVariable Long flightNumber, @RequestBody LocalDateTime dateTime)
 			throws Exception {
 		return flightService.updateDateTime(flightNumber, dateTime);
