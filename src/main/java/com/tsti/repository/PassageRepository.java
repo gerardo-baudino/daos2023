@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface PassageRepository extends JpaRepository <Passage, Long> {
 
     Optional<Passage> findByDocumentAndFlightNumber(Long document, Long flightNumber) ;
+    Optional<Passage> findBySeatNumberAndFlightNumber(int seatNumber, Long flightNumber) ;
 
 }
