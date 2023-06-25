@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.text.ParseException;
 import java.util.List;
+
+
 
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
@@ -29,7 +31,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         loadDBFlight();
     }
 
-    public void loadDBClient() {
+    public void loadDBClient() throws ParseException {
         List<Client> clientList = clientRepository.findAll();
         if (clientList.size() == 0) {
             dbClient();
@@ -43,17 +45,17 @@ public class DatabaseInitializer implements CommandLineRunner {
         }
     }
 
-    public void dbClient() {
-        clientRepository.save(new Client(null, 20000000L, "juan", "gomez", "Calle 1", "juan.gomez@gmail.com", "01/01/1980"));
-        clientRepository.save(new Client(null, 20000001L, "maria", "perez", "Calle 2", "maria.perez@gmail.com", "02/02/1980"));
-        clientRepository.save(new Client(null, 20000002L, "jose", "garcia", "Calle 3", "jose.garcia@gmail.com", "03/03/1980"));
-        clientRepository.save(new Client(null, 20000003L, "ana", "fernandez", "Calle 4", "ana.fernandez@gmail.com", "04/04/1980", "10020", "30/04/2025"));
-        clientRepository.save(new Client(null, 20000004L, "pedro", "gonzalez", "Calle 5", "pedro.gonzalez@gmail.com", "05/05/1980", "30060", "03/11/2028"));
+    public void dbClient() throws ParseException {
+        clientRepository.save(new Client(null, 20000000L, "juan", "gomez", "Calle 1", "juan.gomez@gmail.com", "1980-01-01"));
+        clientRepository.save(new Client(null, 20000001L, "maria", "perez", "Calle 2", "maria.perez@gmail.com", "1980-02-02"));
+        clientRepository.save(new Client(null, 20000002L, "jose", "garcia", "Calle 3", "jose.garcia@gmail.com", "1980-03-03"));
+        clientRepository.save(new Client(null, 20000003L, "ana", "fernandez", "Calle 4", "ana.fernandez@gmail.com", "1980-04-04", "10020", "2025-04-30"));
+        clientRepository.save(new Client(null, 20000004L, "pedro", "gonzalez", "Calle 5", "pedro.gonzalez@gmail.com", "1980-05-05", "30060", "2028-11-03"));
     }
 
     private void dbFlight() {
-        flightRepository.save(new Flight(null, 1L, LocalDateTime.now(), 1, 2, "Internacional", "Brasil", Flight.ORIGIN, "Registrado"));
-        flightRepository.save(new Flight(null, 2L, LocalDateTime.now(), 2, 2, "Internacional", "Mexico", Flight.ORIGIN, "Registrado"));
-        flightRepository.save(new Flight(null, 3L, LocalDateTime.now(), 3, 2, "Nacional", "Salta", Flight.ORIGIN, "Registrado"));
+        flightRepository.save(new Flight(null, 1L, "2025-01-05T23:20:00", 1, 2, "Internacional", "Brasil", Flight.ORIGIN, "Registrado"));
+        flightRepository.save(new Flight(null, 2L, "2025-03-28T10:10:00", 2, 2, "Internacional", "Mexico", Flight.ORIGIN, "Registrado"));
+        flightRepository.save(new Flight(null, 3L, "2025-04-30T15:45:00", 3, 2, "Nacional", "Salta", Flight.ORIGIN, "Registrado"));
     }
 }

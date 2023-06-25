@@ -1,11 +1,9 @@
 package com.tsti.entity;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Flight {
@@ -15,7 +13,8 @@ public class Flight {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private Long flightNumber;
-	private LocalDateTime dateTime;
+	@Column(columnDefinition = "DATETIME")
+	private String dateTime;
 	private int numRows;
 	private int seatsPerRow;
 	private String flightType;
@@ -26,7 +25,7 @@ public class Flight {
 	public Flight() {
 	}
 
-	public Flight(Long id, Long flightNumber, LocalDateTime dateTime, int numRows, int seatsPerRow, String flightType, String destination, String origin, String status) {
+	public Flight(Long id, Long flightNumber, String dateTime, int numRows, int seatsPerRow, String flightType, String destination, String origin, String status) {
 		this.id = id;
 		this.flightNumber = flightNumber;
 		this.dateTime = dateTime;
@@ -52,14 +51,6 @@ public class Flight {
 
 	public void setFlightNumber(Long flightNumber) {
 		this.flightNumber = flightNumber;
-	}
-
-	public LocalDateTime getDateTime() {
-		return dateTime;
-	}
-
-	public void setDateTime(LocalDateTime dateTime) {
-		this.dateTime = dateTime;
 	}
 
 	public int getNumRows() {
@@ -104,5 +95,22 @@ public class Flight {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public LocalDateTime getDateTime() {
+		if (dateTime == null) {
+			return null;
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		return LocalDateTime.parse(dateTime, formatter);
+	}
+
+	public void setDateTime(LocalDateTime dateTime) {
+		if (dateTime == null) {
+			this.dateTime = null;
+		} else {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			this.dateTime = dateTime.format(formatter);
+		}
 	}
 }

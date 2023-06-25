@@ -1,9 +1,9 @@
 package com.tsti.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 public class Client {
@@ -15,9 +15,11 @@ public class Client {
     private String lastName;
     private String address;
     private String email;
-    private String birthDate;
+    @Column(columnDefinition = "DATE")
+    private String  birthDate;
     private String passportNumber;
-    private String passportExpirationDate;
+    @Column(columnDefinition = "DATE")
+    private String  passportExpirationDate;
 
     public Client() {
     }
@@ -92,12 +94,21 @@ public class Client {
         this.email = email;
     }
 
-    public String getBirthDate() {
-        return birthDate;
+    public LocalDate  getBirthDate() {
+        if (birthDate == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return LocalDate.parse(birthDate, formatter);
     }
 
-    public void setBirthDate(String birthDate) {
-        this.birthDate = birthDate;
+    public void setBirthDate(LocalDate birthDate) {
+        if (birthDate == null) {
+            this.birthDate = null;
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            this.birthDate = birthDate.format(formatter);
+        }
     }
 
     public String getPassportNumber() {
@@ -108,11 +119,20 @@ public class Client {
         this.passportNumber = passportNumber;
     }
 
-    public String getPassportExpirationDate() {
-        return passportExpirationDate;
+    public LocalDate getPassportExpirationDate() {
+        if (passportExpirationDate == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return LocalDate.parse(passportExpirationDate, formatter);
     }
 
-    public void setPassportExpirationDate(String passportExpirationDate) {
-        this.passportExpirationDate = passportExpirationDate;
+    public void setPassportExpirationDate(LocalDate passportExpirationDate) {
+        if (passportExpirationDate == null) {
+            this.passportExpirationDate = null;
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            this.passportExpirationDate = passportExpirationDate.format(formatter);
+        }
     }
 }
