@@ -23,7 +23,7 @@ public class ClientService implements IClientService {
     public ResponseEntity<?> create(Client client) throws Exception {
         Optional<Client> dbClient = search(client.getDocument());
         if (!dbClient.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe un cliente con ese DNI");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ya existe un cliente registrado con ese DNI");
         }
         Client savedClient = clientRepository.save(client);
         if (savedClient.getId() != null) {
