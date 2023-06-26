@@ -9,13 +9,17 @@ import java.util.Optional;
 
 public interface IFlightService {
 
-	ResponseEntity<?> create(Flight flight) throws Exception;
+    ResponseEntity<?> create(Flight flight) throws Exception;
 
-	Optional<Flight> search(Long flightNumber) throws Exception;
+    Optional<Flight> search(Long flightNumber) throws Exception;
 
-	ResponseEntity<?> update(Flight flight) throws Exception;
+    ResponseEntity<?> update(Flight flight) throws Exception;
 
-	ResponseEntity<?> updateDateTime(Long flightNumber, LocalDateTime dateTime) throws Exception;
+    ResponseEntity<?> updateDateTime(Long flightNumber, LocalDateTime dateTime) throws Exception;
 
-	ResponseEntity<?> delete(Long id) throws Exception;
+    ResponseEntity<?> delete(Long id) throws Exception;
+
+    boolean isInternationalFlight(Long flightNumber) throws Exception;
+
+    boolean isValidFlight(Long flightNumber) throws Exception;
 }

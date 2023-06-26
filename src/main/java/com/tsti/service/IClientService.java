@@ -14,4 +14,6 @@ public interface IClientService {
      ResponseEntity<?> update(Client client) throws Exception;
 
      ResponseEntity<?> delete(Long id) throws Exception;
+
+     boolean validateClientForFlight(Client client, boolean isInternationalFlight) throws Exception;
 }
