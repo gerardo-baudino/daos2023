@@ -1,14 +1,16 @@
 package com.tsti.repository;
 
-
 import com.tsti.entity.Passage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface PassageRepository extends JpaRepository <Passage, Long> {
+public interface PassageRepository extends JpaRepository<Passage, Long> {
 
-    Optional<Passage> findByDocumentAndFlightNumber(Long document, Long flightNumber) ;
-    Optional<Passage> findBySeatNumberAndFlightNumber(int seatNumber, Long flightNumber) ;
+    Optional<Passage> findByDocumentAndFlightNumber(Long document, Long flightNumber);
 
+    Optional<Passage> findBySeatNumberAndFlightNumber(int seatNumber, Long flightNumber);
+
+    List<Passage> findByFlightNumber(Long flightNumber);
 }

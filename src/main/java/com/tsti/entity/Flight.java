@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 @Entity
 public class Flight {
 	public static final String ORIGIN = "Aeropuerto Sauce Viejo";
+	public static final String TYPE_INTERNATIONAL = "Internacional";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

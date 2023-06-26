@@ -97,4 +97,28 @@ public class FlightService implements IFlightService {
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
+
+	@Override
+	public boolean isInternationalFlight(Long flightNumber) throws Exception {
+		Optional<Flight> flightOptional = flightRepository.findById(flightNumber);
+		if (flightOptional.isPresent()) {
+			Flight flight = flightOptional.get();
+			return Flight.TYPE_INTERNATIONAL.equalsIgnoreCase(flight.getFlightType());
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isValidFlight(Long flightNumber) throws Exception {
+		// Verificar existencia del vuelo
+		Optional<Flight> flightOptional = flightRepository.findById(flightNumber);
+		if (flightOptional.isEmpty()) {
+			return false;
+		}
+		Flight flight = flightOptional.get();
+
+		// Verificar si el vuelo es futuro (no pasado)
+		LocalDateTime currentDateTime = LocalDateTime.now();
+		return !flight.getDateTime().isBefore(currentDateTime);
+	}
 }
