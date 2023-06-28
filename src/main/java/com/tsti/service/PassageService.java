@@ -1,60 +1,64 @@
 package com.tsti.service;
 
 import com.tsti.entity.Client;
+import com.tsti.entity.Flight;
 import com.tsti.entity.Passage;
+import com.tsti.repository.ClientRepository;
+import com.tsti.repository.FlightRepository;
 import com.tsti.repository.PassageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
-
 @Service
 public class PassageService implements IPassageService {
 
-    private final PassageRepository passageRepository;
-    private final IClientService iClientService;
-    private final IFlightService iFlightService;
+    private PassageRepository passageRepository;
+    private ClientRepository clientRepository;
+    private FlightRepository flightRepository;
 
-    private final ITicketCostService iTicketCostService;
-
-    public PassageService(PassageRepository passageRepository, IClientService iClientService, IFlightService iFlightService, ITicketCostService iTicketCostService) {
+    @Autowired
+    public PassageService(PassageRepository passageRepository, ClientRepository clientRepository, FlightRepository flightRepository) {
         this.passageRepository = passageRepository;
-        this.iClientService = iClientService;
-        this.iFlightService = iFlightService;
-        this.iTicketCostService = iTicketCostService;
+        this.clientRepository = clientRepository;
+        this.flightRepository = flightRepository;
     }
 
     @Override
     public ResponseEntity<?> create(Passage passage) throws Exception {
-        Optional<Client> dbClient = iClientService.search(passage.getDocument());
+        Optional<Client> dbClient = clientRepository.findByDocument(passage.getDocument());
         if (dbClient.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe un cliente con ese DNI");
         }
-        Client client = dbClient.get();
+        Optional<Flight> dbFlight = flightRepository.findByFlightNumber(passage.getFlightNumber());
+        Flight flight = dbFlight.get();
+        LocalDateTime dateNow = LocalDate.now().atStartOfDay();
+        if (dbFlight.isEmpty() && flight.getDateTime().compareTo(dateNow)< 0 ) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe ese numero de vuelo");
+        }
+        if (dbFlight.isPresent() && dbClient.isPresent()){
 
-        boolean isInternationalFlight = iFlightService.isInternationalFlight(passage.getFlightNumber());
-        if (isInternationalFlight && !iClientService.validateClientForFlight(client, isInternationalFlight)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cliente necesita un pasaporte válido para vuelos internacionales");
+            Client client = dbClient.get();
+            if(flight.getFlightType() == "internacional" && client.getPassportNumber() == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Para solicitar un pasaje internacional, el cliente debe registrar su pasaporte");
+            }
+            int flightCapacity = flight.getSeatsPerRow()* flight.getNumRows();
+            if (passage.getSeatNumber()>flightCapacity || passage.getSeatNumber()<0 ){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe esa capacidad de asientos");
+            }
+            if(passageRepository.findBySeatNumberAndFlightNumber(passage.getSeatNumber() ,passage.getFlightNumber()).isPresent()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Asiento no disponible");
+            }
         }
 
-        if (!iFlightService.isValidFlight(passage.getFlightNumber())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe vuelo para los datos suministrados");
-        }
-
-        if (isSeatAvailable(passage.getFlightNumber(), passage.getSeatNumber())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Asiento no disponible");
-        }
 
         Passage savedPassage = passageRepository.save(passage);
         if (savedPassage.getId() != null) {
-            try {
-                double cost = iTicketCostService.getTicketCost(passage.getFlightNumber(), passage.getDocument());
-                return ResponseEntity.status(HttpStatus.CREATED).body("Costo: " + cost);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-            }
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -62,15 +66,5 @@ public class PassageService implements IPassageService {
     @Override
     public Optional<Passage> search(Long document, Long flightNumber) throws Exception {
         return passageRepository.findByDocumentAndFlightNumber(document, flightNumber);
-    }
-
-    private boolean isSeatAvailable(Long flightNumber, int seatNumber) throws Exception {
-        List<Passage> passages = passageRepository.findByFlightNumber(flightNumber);
-        for (Passage passage : passages) {
-            if (passage.getSeatNumber() == seatNumber) {
-                return false; // Asiento ocupado
-            }
-        }
-        return true;
     }
 }
