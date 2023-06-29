@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Flight {
@@ -16,9 +17,13 @@ public class Flight {
 	private Long flightNumber;
 	@Column(columnDefinition = "DATETIME")
 	private String dateTime;
+	@NotNull(message = "Debe completar el número de filas")
 	private int numRows;
+	@NotNull(message = "Debe completar el número de asientos por fila")
 	private int seatsPerRow;
+	@NotNull(message = "Debe completar el tipo de vuelo: Nacional o Internacional")
 	private String flightType;
+	@NotNull(message = "Debe completar el destino")
 	private String destination;
 	private String origin = ORIGIN;
 	private String status;

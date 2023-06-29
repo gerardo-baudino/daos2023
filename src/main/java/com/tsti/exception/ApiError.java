@@ -41,11 +41,4 @@ public class ApiError {
     public void setErrors(List<String> errors) {
         this.errors = errors;
     }
-
-    // Getters y Setters
-
-
-
-
-    // Otros métodos, si es necesario
 }
