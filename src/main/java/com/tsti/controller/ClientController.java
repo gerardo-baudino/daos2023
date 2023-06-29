@@ -37,8 +37,7 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<?> createClient(@Valid @RequestBody Client client, BindingResult result) throws Exception {
-        if(result.hasErrors())
-        {
+        if(result.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.formatterError(result));
         }
         try {
@@ -60,7 +59,7 @@ public class ClientController {
         if (clientOptional.isPresent()) {
             Client client = clientOptional.get();
 
-            Link selfLink = Link.of("/client/" + client.getId());
+            Link selfLink = Link.of("/client/" + client.getDocument());
             EntityModel<Client> resourceWithLink = EntityModel.of(client, selfLink);
 
             return ResponseEntity.ok(resourceWithLink);
@@ -74,7 +73,7 @@ public class ClientController {
         try {
         ResponseEntity<?> responseEntity = clientService.update(client);
 
-        Link selfLink = Link.of("/client/" + client.getId());
+        Link selfLink = Link.of("/client/" + client.getDocument());
         EntityModel<?> resourceWithLink = EntityModel.of(responseEntity.getBody(), selfLink);
 
         return ResponseEntity.status(responseEntity.getStatusCode())
@@ -100,8 +99,7 @@ public class ClientController {
         throw new ExceptionCustom(exceptionCustom.getMessage(), exceptionCustom.getStatusCode());
      }
     }
-    private String formatterError(BindingResult result) throws JsonProcessingException
-    {
+    private String formatterError(BindingResult result) throws JsonProcessingException {
         List<Map<String, String>> errors = result.getFieldErrors().stream().map(err -> {
             Map<String, String> error= new HashMap<>();
             error.put(err.getField(),err.getDefaultMessage() );

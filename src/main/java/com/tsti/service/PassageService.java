@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,35 +33,36 @@ public class PassageService implements IPassageService {
     public ResponseEntity<?> create(Passage passage) throws Exception {
         Optional<Client> dbClient = clientRepository.findByDocument(passage.getDocument());
         if (dbClient.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe un cliente con ese DNI");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un cliente con ese DNI");
+
         }
         Optional<Flight> dbFlight = flightRepository.findByFlightNumber(passage.getFlightNumber());
         Flight flight = dbFlight.get();
         LocalDateTime dateNow = LocalDate.now().atStartOfDay();
         if (dbFlight.isEmpty() && flight.getDateTime().compareTo(dateNow)< 0 ) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe ese numero de vuelo");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ese numero de vuelo");
         }
         if (dbFlight.isPresent() && dbClient.isPresent()){
 
             Client client = dbClient.get();
-            if(flight.getFlightType() == "internacional" && client.getPassportNumber() == null){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Para solicitar un pasaje internacional, el cliente debe registrar su pasaporte");
+            if(flight.getFlightType().toLowerCase() == "internacional" && client.getPassportNumber() == null){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Para solicitar un pasaje internacional, el cliente debe registrar su pasaporte");
             }
             int flightCapacity = flight.getSeatsPerRow()* flight.getNumRows();
             if (passage.getSeatNumber()>flightCapacity || passage.getSeatNumber()<0 ){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe esa capacidad de asientos");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe esa capacidad de asientos");
             }
             if(passageRepository.findBySeatNumberAndFlightNumber(passage.getSeatNumber() ,passage.getFlightNumber()).isPresent()){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Asiento no disponible");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Asiento no disponible");
             }
         }
 
 
         Passage savedPassage = passageRepository.save(passage);
-        if (savedPassage.getId() != null) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
+        if (savedPassage.getId() == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Hubo un error inesperado, vuelva a intentar");
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPassage);
     }
 
     @Override
