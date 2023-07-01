@@ -1,9 +1,6 @@
 package com.tsti.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Random;
@@ -12,15 +9,17 @@ import java.util.Random;
 public class Passage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private Long id;
     @NotNull(message = "Debe completar el documento")
+    @Column(name = "DOCUMENT")
     private Long document;
     @NotNull(message = "Debe completar el número de vuelo")
+    @Column(name = "FLIGHT_NUMBER")
     private Long flightNumber;
     @NotNull(message = "Debe completar el número de asiento")
+    @Column(name = "SEAT_NUMBER")
     private int seatNumber;
-
-    private int cost;
 
     public Passage() {
     }
@@ -68,7 +67,6 @@ public class Passage {
         Random random = new Random();
         int min = 1000;
         int max = 5000;
-        cost = random.nextInt(max - min + 1) + min;
-        return cost;
+        return random.nextInt(max - min + 1) + min;
     }
 }

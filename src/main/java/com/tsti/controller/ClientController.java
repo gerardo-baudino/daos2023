@@ -3,13 +3,14 @@ package com.tsti.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsti.controller.error.MessageError;
+import com.tsti.dto.ClientDTO;
 import com.tsti.entity.Client;
 import com.tsti.exception.ExceptionCustom;
 import com.tsti.service.IClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -27,8 +28,7 @@ import java.util.stream.Collectors;
 @RestController
 @Validated
 public class ClientController {
-
-    private IClientService clientService;
+    private final IClientService clientService;
 
     @Autowired
     public ClientController(IClientService clientService) {
@@ -37,18 +37,15 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<?> createClient(@Valid @RequestBody Client client, BindingResult result) throws Exception {
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.formatterError(result));
         }
         try {
             ResponseEntity<?> responseEntity = clientService.create(client);
-            Link selfLink = Link.of("/client/" + client.getDocument());
-            EntityModel<?> resourceWithLink = EntityModel.of(responseEntity.getBody(), selfLink);
-
             return ResponseEntity.status(responseEntity.getStatusCode())
                     .headers(responseEntity.getHeaders())
-                    .body(resourceWithLink);
-        } catch (ExceptionCustom exceptionCustom){
+                    .body(buildResponse(client));
+        } catch (ExceptionCustom exceptionCustom) {
             throw new ExceptionCustom(exceptionCustom.getMessage(), exceptionCustom.getStatusCode());
         }
     }
@@ -58,11 +55,7 @@ public class ClientController {
         Optional<Client> clientOptional = clientService.search(document);
         if (clientOptional.isPresent()) {
             Client client = clientOptional.get();
-
-            Link selfLink = Link.of("/client/" + client.getDocument());
-            EntityModel<Client> resourceWithLink = EntityModel.of(client, selfLink);
-
-            return ResponseEntity.ok(resourceWithLink);
+            return ResponseEntity.ok(buildResponse(client));
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -71,15 +64,13 @@ public class ClientController {
     @PutMapping
     public ResponseEntity<?> updateClient(@Valid @RequestBody Client client) throws Exception {
         try {
-        ResponseEntity<?> responseEntity = clientService.update(client);
+            ResponseEntity<?> responseEntity = clientService.update(client);
+            Client updatedClient = (Client) responseEntity.getBody();
 
-        Link selfLink = Link.of("/client/" + client.getDocument());
-        EntityModel<?> resourceWithLink = EntityModel.of(responseEntity.getBody(), selfLink);
-
-        return ResponseEntity.status(responseEntity.getStatusCode())
-                .headers(responseEntity.getHeaders())
-                .body(resourceWithLink);
-        } catch (ExceptionCustom exceptionCustom){
+            return ResponseEntity.status(responseEntity.getStatusCode())
+                    .headers(responseEntity.getHeaders())
+                    .body(buildResponse(updatedClient));
+        } catch (ExceptionCustom exceptionCustom) {
             throw new ExceptionCustom(exceptionCustom.getMessage(), exceptionCustom.getStatusCode());
         }
     }
@@ -87,22 +78,17 @@ public class ClientController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteClient(@Valid @PathVariable Long id) throws Exception {
         try {
-        ResponseEntity<?> responseEntity = clientService.delete(id);
-
-        Link selfLink = Link.of("/client/" + id);
-        EntityModel<?> resourceWithLink = EntityModel.of(responseEntity.getBody(), selfLink);
-
-        return ResponseEntity.status(responseEntity.getStatusCode())
-                .headers(responseEntity.getHeaders())
-                .body(resourceWithLink);
-    } catch (ExceptionCustom exceptionCustom){
-        throw new ExceptionCustom(exceptionCustom.getMessage(), exceptionCustom.getStatusCode());
-     }
+            clientService.delete(id);
+            return ResponseEntity.ok().build();
+        } catch (ExceptionCustom exceptionCustom) {
+            throw new ExceptionCustom(exceptionCustom.getMessage(), exceptionCustom.getStatusCode());
+        }
     }
+
     private String formatterError(BindingResult result) throws JsonProcessingException {
         List<Map<String, String>> errors = result.getFieldErrors().stream().map(err -> {
-            Map<String, String> error= new HashMap<>();
-            error.put(err.getField(),err.getDefaultMessage() );
+            Map<String, String> error = new HashMap<>();
+            error.put(err.getField(), err.getDefaultMessage());
             return error;
         }).collect(Collectors.toList());
         MessageError e = new MessageError();
@@ -110,7 +96,19 @@ public class ClientController {
         e.setMenssage(errors);
 
         ObjectMapper maper = new ObjectMapper();
-        String json = maper.writeValueAsString(e);
-        return json;
+        return maper.writeValueAsString(e);
+    }
+
+    private ClientDTO buildResponse(Client client) throws ExceptionCustom {
+        try {
+            ClientDTO dto = new ClientDTO(client);
+            Link selfLink = WebMvcLinkBuilder.linkTo(ClientController.class)
+                    .slash(client.getDocument())
+                    .withSelfRel();
+            dto.add(selfLink);
+            return dto;
+        } catch (Exception e) {
+            throw new ExceptionCustom(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

@@ -15,22 +15,18 @@ import java.text.ParseException;
 import java.util.List;
 
 
-
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
 
-    private ClientRepository clientRepository;
-    private FlightRepository flightRepository;
+    private final ClientRepository clientRepository;
+    private final FlightRepository flightRepository;
     private final PassageRepository passageRepository;
-    private IClientService clientService;
 
     @Autowired
-    public DatabaseInitializer(ClientRepository clientRepository, FlightRepository flightRepository,
-                               PassageRepository passageRepository, IClientService clientService) {
+    public DatabaseInitializer(ClientRepository clientRepository, FlightRepository flightRepository, PassageRepository passageRepository, IClientService clientService) {
         this.clientRepository = clientRepository;
         this.flightRepository = flightRepository;
         this.passageRepository = passageRepository;
-        this.clientService = clientService;
     }
 
     @Override

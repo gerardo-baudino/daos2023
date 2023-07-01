@@ -24,8 +24,8 @@ public class FlightService implements IFlightService {
 
 	@Override
 	public ResponseEntity<?> create(Flight flight) throws Exception {
-		Optional<Flight> existingFlight = flightRepository.findByFlightNumber(flight.getFlightNumber());
-		if (existingFlight.isPresent()) {
+		Flight existingFlight = flightRepository.findByFlightNumber(flight.getFlightNumber());
+		if (existingFlight != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un vuelo con el mismo número");
 		}
 		FlightStatusManager.registerFlight(flight);
@@ -38,38 +38,20 @@ public class FlightService implements IFlightService {
 	}
 
 	@Override
-	public Optional<Flight> search(Long flightNumber) throws Exception {
+	public Flight search(Long flightNumber) throws Exception {
 		return flightRepository.findByFlightNumber(flightNumber);
 	}
 
 	@Override
 	public ResponseEntity<?> update(Flight flight) throws Exception {
-		Optional<Flight> dbFlight = flightRepository.findById(flight.getId());
-		if (dbFlight.isEmpty()) {
+		Flight updatedFlight = flightRepository.findByFlightNumber(flight.getFlightNumber());
+		if (updatedFlight == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vuelo no encontrado");
 		}
-		FlightStatusManager.updateFlightStatus(flight);
-		flight.setDateTime(LocalDateTime.now());
-
-		Flight savedFlight = flightRepository.save(flight);
-		if (savedFlight.getId() != null) {
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	@Override
-	public ResponseEntity<?> updateDateTime(Long flightNumber, LocalDateTime dateTime) throws Exception {
-		Optional<Flight> dbFlight = flightRepository.findByFlightNumber(flightNumber);
-		if (dbFlight.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vuelo no encontrado");
-		}
-		Flight updatedFlight = dbFlight.get();
-		if (!FlightStatusManager.isFlightRegistered(updatedFlight)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El vuelo no puede ser modificado");
+		if (FlightStatusManager.isFlightRegistered(updatedFlight)) {
+			updatedFlight.setDateTime(flight.getDateTime());
 		}
 
-		updatedFlight.setDateTime(dateTime);
 		FlightStatusManager.updateFlightStatus(updatedFlight);
 
 		Flight savedFlight = flightRepository.save(updatedFlight);
@@ -80,15 +62,13 @@ public class FlightService implements IFlightService {
 	}
 
 	@Override
-	public ResponseEntity<?> delete(Long id) throws Exception {
-		Optional<Flight> flightOptional = flightRepository.findById(id);
-		if (flightOptional.isEmpty()) {
+	public ResponseEntity<?> delete(Long flightNumber) throws Exception {
+		Flight flight = flightRepository.findByFlightNumber(flightNumber);
+		if (flight == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vuelo no encontrado");
 		}
-		Flight flight = flightOptional.get();
-
-		if (!FlightStatusManager.isFlightRegistered(flight)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El vuelo no puede ser eliminado");
+		if (FlightStatusManager.isFlightCanceled(flight)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El Vuelo ya se encuentra cancelado");
 		}
 		FlightStatusManager.cancelFlight(flight);
 

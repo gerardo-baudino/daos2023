@@ -1,15 +1,20 @@
 package com.tsti.exception;
 
+import org.springframework.http.HttpStatus;
+
+import java.io.Serial;
+
 public class ExceptionCustom extends Exception {
+    @Serial
     private static final long serialVersionUID = 3941221036411842318L;
     private String message;
-    private int statusCode;
+    private HttpStatus statusCode;
 
     public ExceptionCustom() {
         super();
 
     }
-    public ExceptionCustom(String message, int statusCode) {
+    public ExceptionCustom(String message, HttpStatus statusCode) {
         super();
         this.message = message;
         this.statusCode = statusCode;
@@ -22,11 +27,11 @@ public class ExceptionCustom extends Exception {
         this.message = message;
     }
 
-    public int getStatusCode() {
+    public HttpStatus getStatusCode() {
         return statusCode;
     }
 
-    public void setStatusCode(int statusCode) {
+    public void setStatusCode(HttpStatus statusCode) {
         this.statusCode = statusCode;
     }
 }

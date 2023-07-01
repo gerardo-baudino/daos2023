@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 public class ClientService implements IClientService {
 
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
     @Autowired
     public ClientService(ClientRepository clientRepository) {
@@ -23,7 +23,7 @@ public class ClientService implements IClientService {
 
     @Override
     public ResponseEntity<?> create(Client client) throws Exception {
-        Optional<Client> dbClient = search(client.getDocument());
+        Optional<Client> dbClient = clientRepository.findByDocument(client.getDocument());
         if (dbClient.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un cliente registrado con ese DNI");
         }
@@ -41,21 +41,21 @@ public class ClientService implements IClientService {
 
     @Override
     public ResponseEntity<?> update(Client client) throws Exception {
-        Optional<Client> dbClient = search(client.getDocument());
+        Optional<Client> dbClient = clientRepository.findByDocument(client.getDocument());
         if (dbClient.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verifique no alterar el DNI o que el mismo se encuentre ya registrado");
         }
         Client savedClient = clientRepository.save(client);
-        if (savedClient.getId() != null) {
-            return new ResponseEntity<>(HttpStatus.OK);
+        if (savedClient.getId() == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Hubo un error inesperado, vuelva a intentar");
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.OK).body(savedClient);
     }
 
     @Override
     public ResponseEntity<?> delete(Long id) throws Exception {
         Optional<Client> dbClient = clientRepository.findById(id);
-        if (!dbClient.isEmpty()) {
+        if (dbClient.isPresent()) {
             clientRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         }

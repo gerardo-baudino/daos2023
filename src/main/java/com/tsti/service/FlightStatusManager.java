@@ -28,7 +28,10 @@ public class FlightStatusManager {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		LocalDateTime flightDateTime = flight.getDateTime();
 
-		if (currentDateTime.isAfter(flightDateTime)) {
+		if (flightDateTime == null) {
+			flight.setDateTime(currentDateTime);
+			flight.setStatus(STATUS_REGISTERED);
+		} else if (currentDateTime.isAfter(flightDateTime)) {
 			flight.setStatus(STATUS_REGISTERED);
 		} else {
 			flight.setStatus(STATUS_RESCHEDULED);
@@ -37,5 +40,9 @@ public class FlightStatusManager {
 	
 	public static boolean isFlightRegistered(Flight flight) {
 		return flight.getStatus().equals(STATUS_REGISTERED);
+	}
+
+	public static boolean isFlightCanceled(Flight flight) {
+		return flight.getStatus().equals(STATUS_CANCELLED);
 	}
 }
