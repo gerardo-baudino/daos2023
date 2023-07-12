@@ -117,7 +117,7 @@ public class Flight {
         if (dateTime == null) {
             return null;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         return LocalDateTime.parse(dateTime, formatter);
     }
 
@@ -125,7 +125,7 @@ public class Flight {
         if (dateTime == null) {
             this.dateTime = null;
         } else {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
             this.dateTime = dateTime.format(formatter);
         }
     }
